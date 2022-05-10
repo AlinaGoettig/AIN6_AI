@@ -55,7 +55,7 @@ public class KalahBoard {
 	// Konsolen-Ein/Ausgabe:
 	private static Scanner in = new Scanner(System.in);
 	private static final String ANSI_BLUE = "\u001B[34m";
-	
+
 	/**
 	 *	Konstruktor.
 	 *  Legt eine Kalah-Board mit NMulden mit je NSteine an.
@@ -140,7 +140,7 @@ public class KalahBoard {
 	 * Ausgabe des Bretts.
 	 */
 	public void print() {
-		char winner = evaluateGame(7);
+		char winner = evaluateGame(8);
 		String s1 = 
 		"         === Player A ===           " + "\n";
 		
@@ -411,23 +411,16 @@ public class KalahBoard {
 	}
 
 	private int MaxAction(KalahBoard state, int limit) {
-		int maxValue = -1;
-		List<KalahBoard> actions = this.possibleActions();
-		for (KalahBoard action: actions) {
-			int actionValue = MinValue(action, limit);
-			if (maxValue < actionValue)
-				maxValue = actionValue;
-		}
-		return maxValue;
+		return MinValue(state, limit);
 	}
 
 	private int MinValue(KalahBoard state, int limit) {
 		KalahBoard copyBoard = new KalahBoard(state);
-		if (copyBoard.finish())
-			return copyBoard.getCurPlayer() == APlayer ? 1 : -1; // 1 = Player A wins / -1 = Player B wins
-		if (limit <= 0)
-			return 0;
-		int v = 80; // Max. 80
+		if (copyBoard.finish()) {
+			return copyBoard.getCurPlayer() == APlayer ? -1 : 1; // 1 = Player A wins / -1 = Player B wins
+		}
+		if (limit <= 0) { return 0; }
+		int v = Integer.MAX_VALUE;
 		for (KalahBoard move : copyBoard.possibleActions()) {
 			v = min(v, MaxValue(move, limit-1));
 		}
@@ -437,10 +430,10 @@ public class KalahBoard {
 	private int MaxValue(KalahBoard state, int limit) {
 		KalahBoard copyBoard = new KalahBoard(state);
 		if (copyBoard.finish())
-			return copyBoard.getCurPlayer() == APlayer ? 1 : -1; // 1 = Player A wins / -1 = Player B wins
+			return copyBoard.getCurPlayer() == APlayer ? -1 : 1; // 1 = Player A wins / -1 = Player B wins
 		if (limit <= 0)
 			return 0;
-		int v = -80; // Min. -80
+		int v = Integer.MIN_VALUE;
 		for (KalahBoard move : copyBoard.possibleActions()) {
 			v = max(v, MinValue(move, limit-1));
 		}
