@@ -33,20 +33,42 @@ public class Kalah {
 		kalahBd.move(7);
 		kalahBd.print();
 	}
-	
+
+	/*
+		count b): 18831, 31152, 14546
+			Spiele: 3
+			AI Siege: 0
+
+		count c): 7, 2, 3
+			Spiele: 3
+			AI Siege: 0
+
+		count d): 618, 457, 31, 618, 41, 120
+			Spiele: 9
+			AI Siege: 4
+	 */
 	/**
 	 * Mensch gegen Mensch
 	 */
 	public static void testHHGame() {
 		KalahBoard kalahBd = new KalahBoard();
+		kalahBd.setVersion(3);
 		kalahBd.print();
 
 		while (!kalahBd.isFinished()) {
-			int action = kalahBd.readAction();
+			int action = 0;
+			if (kalahBd.getCurPlayer() == kalahBd.APlayer) {
+				action = kalahBd.readAction();
+			} else {
+				KalahBoard brett = kalahBd.MaxAction(7);
+				action = brett.getLastPlay();
+				System.out.print(ANSI_BLUE + kalahBd.getCurPlayer() + " spielt Mulde: " + action + "\n");
+			}
 			kalahBd.move(action);
 			kalahBd.print();
 		}
 
-		System.out.println("\n" + ANSI_BLUE + "GAME OVER");
+		System.out.println("\n" + ANSI_BLUE + "GAME OVER - Player " + kalahBd.winner() + " wins!");
+		System.out.println("\n Es wurden insgesamt " + kalahBd.count + " Züge berechnet.");
 	}
 }

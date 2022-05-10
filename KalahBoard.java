@@ -1,9 +1,7 @@
 package kalah;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.min;
 import static java.lang.Math.max;
@@ -24,6 +22,9 @@ public class KalahBoard {
 
 	public static final char APlayer = 'A';    // Spieler A
 	public static final char BPlayer = 'B';  // Spieler B
+	// Version 1 = b) , 2 = c), 3 = d)
+	private static int VERSION = 3;
+	public static int count = 0;
 
 	/*
 	 * Board als Feld.
@@ -91,6 +92,7 @@ public class KalahBoard {
 		curPlayer = b.curPlayer;
 		bonus = b.bonus;
 		finished = b.finished;
+		lastPlay = b.lastPlay;
 	}
 
 	/**
@@ -142,7 +144,7 @@ public class KalahBoard {
 	 * Ausgabe des Bretts.
 	 */
 	public void print() {
-		char winner = evaluateGame(8);
+		// char winner = evaluateGame(8);
 		String s1 =
 				"         === Player A ===           " + "\n";
 
@@ -154,8 +156,9 @@ public class KalahBoard {
 						"      --- --- --- --- --- ---       " + "\n" +
 						" ---                           ---  " + "\n" +
 						"| A |                         | B | " + "\n" +
-						" ---           " + winner + " wins          ---  " + "\n" +
-						"|%2d |                         |%2d | " + "\n" +
+						// " ---           " + winner + " wins          ---  " + "\n" +
+						" ---                           ---  " + "\n" +
+						"|%2d |                        |%2d | " + "\n" +
 						" ---                           ---  " + "\n" +
 						"      --- --- --- --- --- ---       " + "\n" +
 						"     |%2d |%2d |%2d |%2d |%2d |%2d |      " + "\n" +
@@ -414,16 +417,18 @@ public class KalahBoard {
 	 *
 	 * @return char of Player
 	 */
+	/*
 	public char evaluateGame(int limit) {
 		// int eval = MaxAction(this, limit);
-		int eval = MaxAction_AlphaBetaPruning(this, limit);
+		// int eval = MaxAction_AlphaBetaPruning(this, limit);
+		// int eval = MaxAction_AlphaBetaPruning_Heuristik(this, limit);
 		if (eval > 0) return APlayer;
 		else if (eval < 0) return BPlayer;
 		else return '-';
-	}
+	}*/
 
 	// ----------------------------------------------------------
-
+/*
 	// S 3-11
 	private int MaxAction(KalahBoard state, int limit) {
 		return MinValue(state, limit);
@@ -460,7 +465,7 @@ public class KalahBoard {
 	// ****** Aufgabe 3 c) ***************************************************************
 
 	// With Alpha-Beta-Pruning
-	/* !!! - FEHLER IM SKRIPT 3-23 - !!! IN ALPHA_BEATA_SEARCH SOLLTE MINVALUE STEHEN STATT MAXVALUE */
+	/* !!! - FEHLER IM SKRIPT 3-23 - !!! IN ALPHA_BEATA_SEARCH SOLLTE MINVALUE STEHEN STATT MAXVALUE * /
 	private int MaxAction_AlphaBetaPruning(KalahBoard state, int limit) {
 		return MinValue(state, limit, Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
@@ -476,7 +481,7 @@ public class KalahBoard {
 		}
 		int v = Integer.MAX_VALUE;
 		for (KalahBoard move : copyBoard.possibleActions()) {
-			v = min(v, MaxValue(move, limit - 1));
+			v = min(v, MaxValue(move, limit - 1, alpha, beta));
 			if (v <= alpha) return v; // Alpha-Cutoff
 			beta = min(beta, v);
 		}
@@ -492,11 +497,96 @@ public class KalahBoard {
 			return 0;
 		int v = Integer.MIN_VALUE;
 		for (KalahBoard move : copyBoard.possibleActions()) {
-			v = max(v, MinValue(move, limit - 1));
+			v = max(v, MinValue(move, limit - 1, alpha, beta));
 			if (v >= beta) return v; // Beta-Cutoff
 			alpha = max(alpha, v);
 		}
 		return v;
+	}
+*/
+	// ****** Aufgabe 3 d) ***************************************************************
+
+	// With Alpha-Beta-Pruning + Heuristik
+	public KalahBoard MaxAction(int limit) {
+		count = 0;
+		return MinValue(this, limit, Integer.MIN_VALUE, Integer.MAX_VALUE);
+	}
+
+	private KalahBoard MinValue(KalahBoard game, int limit, int alpha, int beta) {
+		count++;
+		KalahBoard state = new KalahBoard(game);
+		if (state.finish() || limit <= 0) {
+			return state;
+		}
+		int v = Integer.MAX_VALUE;
+		List<KalahBoard> possibleActions = sort(state.possibleActions());
+		KalahBoard bestAction = possibleActions.get(0);
+		for (KalahBoard move : possibleActions) {
+			KalahBoard nextMove = MaxValue(move, limit - 1, alpha, beta);
+			int kalahDiff = kalahDiff(nextMove);
+			if (kalahDiff <= v) {
+				v = kalahDiff;
+				bestAction = nextMove;
+			}
+			if (VERSION != 1) { // Nicht das a) Minimax-Verfahren
+				if (v <= alpha) return state; // Alpha-Cutoff
+				beta = min(beta, v);
+			}
+		}
+		return bestAction;
+	}
+
+	private KalahBoard MaxValue(KalahBoard game, int limit, int alpha, int beta) {
+		count++;
+		KalahBoard state = new KalahBoard(game);
+		if (state.finish() || limit <= 0)
+			return state;
+		int v = Integer.MIN_VALUE;
+		List<KalahBoard> possibleActions = sort(state.possibleActions());
+		KalahBoard bestAction = possibleActions.get(0);
+		for (KalahBoard move : possibleActions) {
+			KalahBoard nextMove = MinValue(move, limit - 1, alpha, beta);
+			int kalahDiff = kalahDiff(nextMove);
+			if (kalahDiff >= v) {
+				v = kalahDiff;
+				bestAction = nextMove;
+			}
+			if (VERSION != 1) { // Nicht das a) Minimax-Verfahren
+				if (v >= beta) return state; // Beta-Cutoff
+				alpha = max(alpha, v);
+			}
+		}
+		return bestAction;
+	}
+
+	private int kalahDiff(KalahBoard game) {
+		if (game.getCurPlayer() == BPlayer) {
+			return game.getAKalah() - getBKalah();
+		} else {
+			return game.getBKalah() - game.getAKalah();
+		}
+	}
+
+	private List<KalahBoard> sort(List<KalahBoard> list) {
+		if (VERSION == 3) {
+			list = list.stream()
+					.sorted(Comparator.comparing(board -> Integer.valueOf(kalahDiff(board))))
+					.collect(Collectors.toList());
+		}
+		return list;
+	}
+
+	public void setVersion(int v) {
+		VERSION = v;
+	}
+
+	public String winner() {
+		if (isFinished()) {
+			if (board[AKalah] == board[BKalah])
+				return "A & B";
+			return (board[AKalah] > board[BKalah]) ? "A" : "B";
+		}
+		return "-";
 	}
 
 }
