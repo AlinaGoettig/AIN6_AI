@@ -25,6 +25,7 @@ public class KalahBoard {
 	// Version 1 = b) , 2 = c), 3 = d)
 	private static int VERSION = 3;
 	public static int count = 0;
+	public static List<Integer> counter = new ArrayList<Integer>();
 
 	/*
 	 * Board als Feld.
@@ -505,11 +506,13 @@ public class KalahBoard {
 	}
 */
 	// ****** Aufgabe 3 d) ***************************************************************
-
+// TODO: HIER DEN ZUG ZURPCK GEBEN NICHT DAS BOARD!!
 	// With Alpha-Beta-Pruning + Heuristik
 	public KalahBoard MaxAction(int limit) {
 		count = 0;
-		return MinValue(this, limit, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		KalahBoard bestMove = MinValue(this, limit, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		counter.add(count);
+		return bestMove;
 	}
 
 	private KalahBoard MinValue(KalahBoard game, int limit, int alpha, int beta) {
@@ -587,6 +590,10 @@ public class KalahBoard {
 			return (board[AKalah] > board[BKalah]) ? "A" : "B";
 		}
 		return "-";
+	}
+
+	public int countCalcs() {
+		return (int) counter.stream().mapToInt((x) -> x).summaryStatistics().getAverage();
 	}
 
 }

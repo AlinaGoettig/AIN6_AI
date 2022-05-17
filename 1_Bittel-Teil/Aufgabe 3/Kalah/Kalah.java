@@ -35,17 +35,18 @@ public class Kalah {
 	}
 
 	/*
-		count b): 18831, 31152, 14546
+		count b): 123351, 136182, 88951
+			Spiele: 5
+			AI Siege: 2
+
+		count c): 2139, 2837, 2565
 			Spiele: 3
 			AI Siege: 0
 
-		count c): 7, 2, 3
-			Spiele: 3
-			AI Siege: 0
-
-		count d): 618, 457, 31, 618, 41, 120
-			Spiele: 9
-			AI Siege: 4
+		count d):
+			Durchschnittliche Counts: 1935, 2422, 2255
+			Spiele: 14
+			AI Siege: 6
 	 */
 	/**
 	 * Mensch gegen Mensch
@@ -69,6 +70,6 @@ public class Kalah {
 		}
 
 		System.out.println("\n" + ANSI_BLUE + "GAME OVER - Player " + kalahBd.winner() + " wins!");
-		System.out.println("\n Es wurden insgesamt " + kalahBd.count + " Züge berechnet.");
+		System.out.println("\n Es wurden durchschnittlich " + kalahBd.countCalcs() + " Züge berechnet.");
 	}
 }
