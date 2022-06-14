@@ -19,7 +19,7 @@ public class A_Star {
 	
 	// openList als Prioritätsliste.
 	// Die Prioritätswerte sind die geschätzen Kosten f = g + h (s. Skript S. 2-66)
-	private static IndexMinPQ<Board, Integer> openList = new IndexMinPQ<>();
+	private static IndexMinPQ<Board, Integer> openList = new IndexMinPQ<Board, Integer>();
 
 	private static Deque<Board> getPath(Board board) {
 		Deque<Board> path = new LinkedList<>();

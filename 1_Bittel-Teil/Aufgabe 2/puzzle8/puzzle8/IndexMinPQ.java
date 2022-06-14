@@ -255,7 +255,7 @@ public class IndexMinPQ<Key, PrioValue> {
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		IndexMinPQ<String, Integer> pq = new IndexMinPQ<>();
+		IndexMinPQ<String, Integer> pq = new IndexMinPQ<String, Integer>();
 		
 		pq.add("abc", 5);
 		pq.add("abc", 7); // wird ignoriert
